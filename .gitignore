@@ -1,0 +1,44 @@
+# --- Unity generated folders ---
+[Ll]ibrary/
+[Tt]emp/
+[Bb]uild*/
+[Ll]ogs/
+UserSettings/
+obj/
+[Bb]in/
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- IDE files ---
+.vscode/
+.idea/
+*.sln
+*.csproj
+*.user
+*.userprefs
+
+# --- Crash dumps / cache ---
+MemoryCaptures/
+sysinfo.txt
+*.stackdump
+
+# --- Platform builds ---
+*.apk
+*.aab
+*.ipa
+*.unitypackage
+
+# --- Gradle/Xcode ---
+.gradle/
+Pods/
+DerivedData/
+*.xcworkspace/
+*.xcuserstate
+*.xcuserdata/
+
+# --- Keep these in repo ---
+!Assets/
+!Packages/
+!ProjectSettings/

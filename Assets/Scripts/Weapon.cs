@@ -22,6 +22,16 @@ public class Weapon : MonoBehaviour
     public float bulletPrefabLifetime = 3f;
 
 
+    public GameObject muzzleEffect;
+    private Animator animator;
+
+   // Loading
+   public float reloadTime;
+   public int magazineSize, bulletsLeft;
+   public bool isReloading; 
+
+
+
     public enum ShootingMode
     {
         Automatic,
@@ -35,11 +45,19 @@ public class Weapon : MonoBehaviour
     {
         readyToShoot = true;
         burstBulletsLeft = bulletsPerBurst;
+        animator = GetComponent<Animator>();
+
+        bulletsLeft = magazineSize;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(bulletsLeft == 0 && isShooting)
+        {
+            SoundManager.Instance.emptyMagazineSound.Play();
+        }
+
         if (currentShootingMode == ShootingMode.Automatic)
         {
             isShooting = Input.GetKey(KeyCode.Mouse0);
@@ -48,16 +66,37 @@ public class Weapon : MonoBehaviour
         {
             isShooting = Input.GetKeyDown(KeyCode.Mouse0);
         }
+
+        if(Input.GetKeyDown(KeyCode.R) && bulletsLeft < magazineSize && isReloading == false)
+        {
+            Reload();
+        }
+
+        // if auto reload when magazine empty
+        if(readyToShoot && isShooting == false && isReloading == false && bulletsLeft <= 0)
+        {
+            Reload();
+        }
         
-        if(readyToShoot && isShooting)
+        if(readyToShoot && isShooting && bulletsLeft > 0)
         {
             burstBulletsLeft = bulletsPerBurst;
             FireWeapon();
+        }
+
+        if(AmmoManager.Instance.ammoDisplay != null)
+        {
+            AmmoManager.Instance.ammoDisplay.text = $"{bulletsLeft/bulletsPerBurst}/{magazineSize/bulletsPerBurst}";
         }
     }
 
     void FireWeapon()
     {
+        bulletsLeft--;
+        muzzleEffect.GetComponent<ParticleSystem>().Play();
+        animator.SetTrigger("RECOIL");
+        SoundManager.Instance.shootingSound.Play();
+
         readyToShoot = false;
         Vector3 shootingDirection = CalculateDirectionAndSpread().normalized;
         GameObject bullet = Instantiate(bulletPrefab, bulletSpawn.position, Quaternion.identity);
@@ -80,6 +119,20 @@ public class Weapon : MonoBehaviour
         }
     }
     
+    private void Reload()
+    {
+        SoundManager.Instance.reloadingSound.Play();
+
+        isReloading = true;
+        Invoke("ReloadCompleted", reloadTime);
+    }
+
+    private void ReloadCompleted()
+    {
+        bulletsLeft = magazineSize;
+        isReloading = false;
+    }
+
     private void ResetShot()
     {
         readyToShoot = true;
